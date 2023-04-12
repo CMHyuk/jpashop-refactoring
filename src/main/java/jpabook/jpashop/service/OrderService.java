@@ -29,7 +29,8 @@ public class OrderService {
 
         //엔티티 조회
         Member member = memberRepository.findOne(memberId);
-        Item item = itemRepository.findOne(itemId);
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow();
 
         //배송정보 생성
         Delivery delivery = new Delivery();
