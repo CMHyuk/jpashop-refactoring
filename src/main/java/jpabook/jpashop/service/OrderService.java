@@ -2,6 +2,7 @@ package jpabook.jpashop.service;
 
 import jpabook.jpashop.domain.*;
 import jpabook.jpashop.domain.item.Item;
+import jpabook.jpashop.exception.ItemNotFound;
 import jpabook.jpashop.repository.ItemRepository;
 import jpabook.jpashop.repository.MemberRepository;
 import jpabook.jpashop.repository.OrderRepository;
@@ -30,7 +31,7 @@ public class OrderService {
         //엔티티 조회
         Member member = memberRepository.findOne(memberId);
         Item item = itemRepository.findById(itemId)
-                .orElseThrow();
+                .orElseThrow(ItemNotFound::new);
 
         //배송정보 생성
         Delivery delivery = new Delivery();
