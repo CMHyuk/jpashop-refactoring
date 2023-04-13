@@ -1,7 +1,7 @@
 package jpabook.jpashop.controller;
 
-import jpabook.jpashop.domain.item.Book;
-import jpabook.jpashop.domain.item.Item;
+import jpabook.jpashop.response.BookResponse;
+import jpabook.jpashop.response.ItemResponse;
 import jpabook.jpashop.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -27,36 +27,29 @@ public class ItemController {
 
     @PostMapping("/items/new")
     public String create(BookForm form) {
-        Book book = Book.builder()
-                .name(form.getName())
-                .price(form.getPrice())
-                .stockQuantity(form.getStockQuantity())
-                .author(form.getAuthor())
-                .isbn(form.getIsbn())
-                .build();
-
-        itemService.saveItem(book);
+        itemService.saveItem(form);
         return "redirect:/";
     }
 
     @GetMapping("/items")
     public String list(Model model) {
-        List<Item> items = itemService.findItems();
+        List<ItemResponse> items = itemService.findItems();
         model.addAttribute("items", items);
         return "items/itemList";
     }
 
     @GetMapping("items/{itemId}/edit")
     public String updateItemForm(@PathVariable("itemId") Long itemId, Model model) {
-        Book item = (Book) itemService.findOne(itemId);
+        ItemResponse item = itemService.findOne(itemId);
+        BookResponse bookResponse = new BookResponse(item);
 
         BookForm form = new BookForm();
-        form.setId(item.getId());
-        form.setName(item.getName());
-        form.setPrice(item.getPrice());
-        form.setStockQuantity(item.getStockQuantity());
-        form.setAuthor(item.getAuthor());
-        form.setIsbn(item.getIsbn());
+        form.setId(bookResponse.getItemId());
+        form.setName(bookResponse.getName());
+        form.setPrice(bookResponse.getPrice());
+        form.setStockQuantity(bookResponse.getStockQuantity());
+        form.setAuthor(bookResponse.getAuthor());
+        form.setIsbn(bookResponse.getIsbn());
 
         model.addAttribute("form", form);
         return "items/updateItemForm";

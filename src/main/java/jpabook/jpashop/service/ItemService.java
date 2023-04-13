@@ -1,12 +1,18 @@
 package jpabook.jpashop.service;
 
+import jpabook.jpashop.controller.BookForm;
+import jpabook.jpashop.domain.item.Book;
 import jpabook.jpashop.domain.item.Item;
+import jpabook.jpashop.exception.ItemNotFound;
 import jpabook.jpashop.repository.ItemRepository;
+import jpabook.jpashop.response.ItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Transactional(readOnly = true)
@@ -16,27 +22,44 @@ public class ItemService {
     private final ItemRepository itemRepository;
 
     @Transactional
-    public void saveItem(Item item) {
-        itemRepository.save(item);
+    public void saveItem(BookForm form) {
+        Book book = Book.builder()
+                .name(form.getName())
+                .price(form.getPrice())
+                .stockQuantity(form.getStockQuantity())
+                .author(form.getAuthor())
+                .isbn(form.getIsbn())
+                .build();
+
+        itemRepository.save(book);
     }
 
     @Transactional
     public void updateItem(Long itemId, String name, int price, int stockQuantity) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow();
+                .orElseThrow(ItemNotFound::new);
 
         item.setName(name);
         item.setPrice(price);
         item.setStockQuantity(stockQuantity);
     }
 
-    public List<Item> findItems() {
-        return itemRepository.findAll();
+    public List<ItemResponse> findItems() {
+        List<Item> items = itemRepository.findAll();
+        return items.stream().map(i -> ItemResponse.builder()
+                        .itemId(i.getId())
+                        .name(i.getName())
+                        .price(i.getPrice())
+                        .stockQuantity(i.getStockQuantity())
+                        .build())
+                .collect(toList());
     }
 
-    public Item findOne(Long itemId) {
-        return itemRepository.findById(itemId)
-                .orElseThrow();
+    public ItemResponse findOne(Long itemId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(ItemNotFound::new);
+
+        return ItemResponse.toEntity(item.getId(), item.getName(), item.getPrice(), item.getStockQuantity());
     }
 
 }
