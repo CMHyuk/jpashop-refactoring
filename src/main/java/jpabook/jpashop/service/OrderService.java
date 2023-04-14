@@ -3,6 +3,7 @@ package jpabook.jpashop.service;
 import jpabook.jpashop.domain.*;
 import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.exception.ItemNotFound;
+import jpabook.jpashop.exception.MemberNotFound;
 import jpabook.jpashop.repository.ItemRepository;
 import jpabook.jpashop.repository.MemberRepository;
 import jpabook.jpashop.repository.OrderRepository;
@@ -27,9 +28,10 @@ public class OrderService {
      */
     @Transactional
     public Long order(Long memberId, Long itemId, int count) {
-
         //엔티티 조회
-        Member member = memberRepository.findOne(memberId);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(MemberNotFound::new);
+
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(ItemNotFound::new);
 
