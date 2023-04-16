@@ -10,7 +10,6 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-
     @Query("select o from Order o join o.member m" +
             " where (:status is null or o.status = :status)" +
             " and (:name is null or m.name like %:name%)")
