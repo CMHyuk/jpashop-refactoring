@@ -4,6 +4,7 @@ import jpabook.jpashop.domain.*;
 import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.exception.ItemNotFound;
 import jpabook.jpashop.exception.MemberNotFound;
+import jpabook.jpashop.exception.OrderNotFound;
 import jpabook.jpashop.repository.ItemRepository;
 import jpabook.jpashop.repository.MemberRepository;
 import jpabook.jpashop.repository.OrderRepository;
@@ -58,13 +59,14 @@ public class OrderService {
     @Transactional
     public void cancelOrder(Long orderId) {
         //주문 엔티티 조회
-        Order order = orderRepository.findOne(orderId);
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(OrderNotFound::new);
         //주문 취소
         order.cancel();
     }
 
     //검색
     public List<Order> findOrders(OrderSearch orderSearch) {
-        return orderRepository.findAllByString(orderSearch);
+        return orderRepository.findAllByString(orderSearch.getOrderStatus(), orderSearch.getMemberName());
     }
 }
