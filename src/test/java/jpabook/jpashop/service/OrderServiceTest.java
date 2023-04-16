@@ -7,6 +7,7 @@ import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.domain.item.Book;
 import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.exception.NotEnoughStockException;
+import jpabook.jpashop.exception.OrderNotFound;
 import jpabook.jpashop.repository.OrderRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,10 +27,11 @@ public class OrderServiceTest {
 
     @Autowired EntityManager em;
     @Autowired OrderService orderService;
-    @Autowired OrderRepository orderRepository;
+    @Autowired
+    OrderRepository orderRepository;
 
     @Test
-    public void 상품주문() throws Exception {
+    public void 상품주문() {
         //given
         Member member = createMember();
 
@@ -41,7 +43,8 @@ public class OrderServiceTest {
         Long orderId = orderService.order(member.getId(), book.getId(), orderCount);
 
         //then
-        Order getOrder = orderRepository.findOne(orderId);
+        Order getOrder = orderRepository.findById(orderId)
+                .orElseThrow();
 
         assertEquals("상품 주문시 상태는 ORDER", OrderStatus.ORDER, getOrder.getStatus());
         assertEquals("주문한 상품 종류 수가 정확해야 한다.", 1, getOrder.getOrderItems().size());
@@ -50,7 +53,7 @@ public class OrderServiceTest {
     }
 
     @Test(expected = NotEnoughStockException.class)
-    public void 상품주문_재고수량초과() throws Exception {
+    public void 상품주문_재고수량초과() {
         //given
         Member member = createMember();
         Item item = createBook("시골 JPA", 10000, 10);
@@ -65,7 +68,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    public void 주문취소() throws Exception {
+    public void 주문취소() {
         //given
         Member member = createMember();
         Book item = createBook("시골 JPA", 10000, 10);
@@ -78,7 +81,8 @@ public class OrderServiceTest {
         orderService.cancelOrder(orderId);
 
         //then
-        Order getOrder = orderRepository.findOne(orderId);
+        Order getOrder = orderRepository.findById(orderId)
+                .orElseThrow(OrderNotFound::new);
 
         assertEquals("주문 취소시 상태는 CANCEL 이다.", OrderStatus.CANCEL, getOrder.getStatus());
         assertEquals("주문이 취소된 상품은 그만큼 재고가 증가해야 한다.", 10, item.getStockQuantity());
@@ -101,6 +105,5 @@ public class OrderServiceTest {
         em.persist(member);
         return member;
     }
-
 
 }
