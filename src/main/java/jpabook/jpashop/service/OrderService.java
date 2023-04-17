@@ -8,12 +8,16 @@ import jpabook.jpashop.exception.OrderNotFound;
 import jpabook.jpashop.repository.ItemRepository;
 import jpabook.jpashop.repository.MemberRepository;
 import jpabook.jpashop.repository.OrderRepository;
-import jpabook.jpashop.repository.OrderSearch;
+import jpabook.jpashop.request.OrderSearch;
+import jpabook.jpashop.response.OrderItemResponse;
+import jpabook.jpashop.response.OrderResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Transactional(readOnly = true)
@@ -66,7 +70,20 @@ public class OrderService {
     }
 
     //검색
-    public List<Order> findOrders(OrderSearch orderSearch) {
-        return orderRepository.findAllByString(orderSearch.getOrderStatus(), orderSearch.getMemberName());
+    public List<OrderResponse> findOrders(OrderSearch orderSearch) {
+        List<Order> orders = orderRepository.findAllByString(orderSearch.getOrderStatus(), orderSearch.getMemberName());
+        return orders.stream().map(o -> OrderResponse.builder()
+                        .orderId(o.getId())
+                        .name(o.getMember().getName())
+                        .orderItem(o.getOrderItems().stream().map(i -> OrderItemResponse.builder()
+                                        .itemName(i.getItem().getName())
+                                        .count(i.getCount())
+                                        .price(i.getItem().getPrice())
+                                        .build())
+                                .collect(toList()))
+                        .orderStatus(o.getStatus())
+                        .localDateTime(o.getOrderDate())
+                        .build())
+                .collect(toList());
     }
 }
