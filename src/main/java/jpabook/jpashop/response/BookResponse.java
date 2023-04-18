@@ -10,7 +10,5 @@ public class BookResponse extends ItemResponse {
 
     public BookResponse(ItemResponse item) {
         super(item.getItemId(), item.getName(), item.getPrice(), item.getStockQuantity());
-        this.author = author;
-        this.isbn = isbn;
     }
 }
