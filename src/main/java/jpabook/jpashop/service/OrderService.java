@@ -72,18 +72,6 @@ public class OrderService {
     //검색
     public List<OrderResponse> findOrders(OrderSearch orderSearch) {
         List<Order> orders = orderRepository.findAllByString(orderSearch.getOrderStatus(), orderSearch.getMemberName());
-        return orders.stream().map(o -> OrderResponse.builder()
-                        .orderId(o.getId())
-                        .name(o.getMember().getName())
-                        .orderItem(o.getOrderItems().stream().map(i -> OrderItemResponse.builder()
-                                        .itemName(i.getItem().getName())
-                                        .count(i.getCount())
-                                        .price(i.getItem().getPrice())
-                                        .build())
-                                .collect(toList()))
-                        .orderStatus(o.getStatus())
-                        .localDateTime(o.getOrderDate())
-                        .build())
-                .collect(toList());
+        return OrderResponse.toOrders(orders);
     }
 }
