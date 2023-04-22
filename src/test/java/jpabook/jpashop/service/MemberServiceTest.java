@@ -1,7 +1,9 @@
 package jpabook.jpashop.service;
 
 import jpabook.jpashop.domain.Member;
+import jpabook.jpashop.exception.MemberNotFound;
 import jpabook.jpashop.repository.MemberRepository;
+import jpabook.jpashop.request.MemberForm;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -23,30 +26,32 @@ public class MemberServiceTest {
     @Autowired EntityManager em;
 
     @Test
-    public void 회원가입() throws Exception {
+    public void 회원가입() {
         //given
-        Member member = new Member();
-        member.setName("kim");
+        MemberForm form = new MemberForm();
+        form.setName("kim");
 
         //when
-        Long savedId = memberService.join(member);
+        Long savedId = memberService.join(form);
+        Member findMember = memberRepository.findById(savedId)
+                .orElseThrow(MemberNotFound::new);
 
         //then
-        assertEquals(member, memberRepository.findById(savedId));
+        assertEquals(form.getName(), findMember.getName());
     }
 
     @Test(expected = IllegalStateException.class)
-    public void 중복_회원_예외() throws Exception {
+    public void 중복_회원_예외() {
         //given
-        Member member1 = new Member();
-        member1.setName("kim");
+        MemberForm form1 = new MemberForm();
+        form1.setName("kim");
 
-        Member member2 = new Member();
-        member2.setName("kim");
+        MemberForm form2 = new MemberForm();
+        form2.setName("kim");
 
         //when
-        memberService.join(member1);
-        memberService.join(member2); //예외가 발생해야 한다!!!
+        memberService.join(form1);
+        memberService.join(form2); //예외가 발생해야 한다!!!
 
         //then
         fail("예외가 발생해야 한다.");
