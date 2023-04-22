@@ -1,9 +1,9 @@
 package jpabook.jpashop.controller;
 
-import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.request.OrderRequest;
 import jpabook.jpashop.request.OrderSearch;
 import jpabook.jpashop.response.ItemResponse;
+import jpabook.jpashop.response.MemberResponse;
 import jpabook.jpashop.response.OrderResponse;
 import jpabook.jpashop.service.ItemService;
 import jpabook.jpashop.service.MemberService;
@@ -28,8 +28,7 @@ public class OrderController {
 
     @GetMapping("/order")
     public String createForm(Model model) {
-
-        List<Member> members = memberService.findMembers();
+        List<MemberResponse> members = memberService.findMembers();
         List<ItemResponse> items = itemService.findItems();
 
         model.addAttribute("members", members);
