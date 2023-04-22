@@ -11,7 +11,7 @@ public class ItemResponse {
     private final int price;
     private final int stockQuantity;
 
-    public static ItemResponse toEntity(Long itemId, String name, int price, int stockQuantity) {
+    public static ItemResponse toItem(Long itemId, String name, int price, int stockQuantity) {
         return ItemResponse.builder()
                 .itemId(itemId)
                 .name(name)
