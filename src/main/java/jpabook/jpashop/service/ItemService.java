@@ -46,12 +46,8 @@ public class ItemService {
 
     public List<ItemResponse> findItems() {
         List<Item> items = itemRepository.findAll();
-        return items.stream().map(i -> ItemResponse.builder()
-                        .itemId(i.getId())
-                        .name(i.getName())
-                        .price(i.getPrice())
-                        .stockQuantity(i.getStockQuantity())
-                        .build())
+        return items.stream().map(i -> ItemResponse.toItem(i.getId(), i.getName(),
+                        i.getPrice(), i.getStockQuantity()))
                 .collect(toList());
     }
 
@@ -59,7 +55,7 @@ public class ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(ItemNotFound::new);
 
-        return ItemResponse.toEntity(item.getId(), item.getName(), item.getPrice(), item.getStockQuantity());
+        return ItemResponse.toItem(item.getId(), item.getName(), item.getPrice(), item.getStockQuantity());
     }
 
 }
