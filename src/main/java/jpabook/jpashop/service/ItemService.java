@@ -23,25 +23,16 @@ public class ItemService {
 
     @Transactional
     public void saveItem(BookForm form) {
-        Book book = Book.builder()
-                .name(form.getName())
-                .price(form.getPrice())
-                .stockQuantity(form.getStockQuantity())
-                .author(form.getAuthor())
-                .isbn(form.getIsbn())
-                .build();
-
+        Book book = Book.build(form);
         itemRepository.save(book);
     }
 
     @Transactional
-    public void updateItem(Long itemId, String name, int price, int stockQuantity) {
-        Item item = itemRepository.findById(itemId)
+    public void updateItem(Long itemId, BookForm form) {
+        Book book = (Book) itemRepository.findById(itemId)
                 .orElseThrow(ItemNotFound::new);
 
-        item.setName(name);
-        item.setPrice(price);
-        item.setStockQuantity(stockQuantity);
+        book.updateItem(form);
     }
 
     public List<ItemResponse> findItems() {
