@@ -2,6 +2,7 @@ package jpabook.jpashop.service;
 
 import jpabook.jpashop.domain.Address;
 import jpabook.jpashop.domain.Member;
+import jpabook.jpashop.exception.MemberDuplicate;
 import jpabook.jpashop.repository.MemberRepository;
 import jpabook.jpashop.request.MemberForm;
 import jpabook.jpashop.response.MemberResponse;
@@ -39,7 +40,7 @@ public class MemberService {
     private void validateDuplicateMember(Member member) {
         List<Member> findMembers = memberRepository.findByName(member.getName());
         if (!findMembers.isEmpty()) {
-            throw new IllegalStateException("이미 존재하는 회원입니다.");
+            throw new MemberDuplicate();
         }
     }
 
